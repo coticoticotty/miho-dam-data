@@ -65,3 +65,35 @@ python scraper.py
 
 注意: GitHub の定期実行は混雑時に数分〜数十分遅れることがあります。
 また、Public リポジトリでは60日間リポジトリの動きが無いと定期実行が自動停止されます。
+
+## ダッシュボード (Streamlit)
+
+`app.py` は `data/miho_dam_history.csv` を読み込み、最新値（観測日時・雨量・流入量・貯水位・放流量）、
+期間フィルタ（24時間 / 3日 / 7日 / 全期間 / カスタム）、雨量・流入量および貯水位・放流量のグラフ、
+データ表とCSVダウンロードを表示します。
+
+### ローカルで起動
+
+```bash
+source .venv/bin/activate        # 未作成なら「手動実行」の手順で作成
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+ブラウザで <http://localhost:8501> が開きます。「最新データに更新」ボタンでキャッシュを破棄して再読み込みします
+（キャッシュは10分、またはCSV更新時に自動で切り替わります）。
+
+### Streamlit Community Cloud へ無料デプロイ
+
+1. このリポジトリを GitHub に push 済みであること（`app.py`・`requirements.txt`・`data/miho_dam_history.csv` を含む）。
+2. <https://share.streamlit.io> に GitHub アカウントでサインインする。
+3. **Create app** → **Deploy a public app from GitHub** を選び、次を指定する。
+   - Repository: `<USER>/miho-dam-data`
+   - Branch: `main`
+   - Main file path: `app.py`
+4. **Advanced settings** で Python は 3.12 を選ぶ（任意）。
+5. **Deploy** を押す。数分でURLが発行される。
+
+GitHub Actions が毎時CSVをコミットするたびに、Streamlit Cloud は新しいコミットを取り込んでアプリを更新します。
+プライベートリポジトリの場合は、サインイン時にリポジトリへのアクセス権限を許可してください。
+アプリは一定期間アクセスがないとスリープし、次回アクセス時に自動で起動し直します。
